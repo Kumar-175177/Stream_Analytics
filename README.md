@@ -129,6 +129,37 @@ This JSON file defines the Azure Logic Apps workflow. It orchestrates the Data F
 
 This project implements an automated ETL framework that efficiently processes both structured and semi-structured data using Azure Data Factory. The job ingests data from Blob Storage, applies Spark-based transformations to compute key metrics like average TTI and TTAR per page URL, and outputs the results to Azure Synapse Analytics for traditional analytics and to Azure Cognitive Search for real-time search and visualization. The process is fully automated and orchestrated by Azure Functions and Azure Logic Apps, which handle task retries with exponential backoff and integrate with Azure Monitor for detailed monitoring and alerting. This design eliminates manual intervention and ensures high scalability, reliability, and low latency in data processing.
 
+
+ Project : Automated ETL Framework for Structured & Semi-Structured Data Processing
+
+🔹 Business Context:
+At Sony, we needed to efficiently process both structured (e.g., sales data) and semi-structured data (e.g., JSON web logs, clickstream data) to gain insights into product performance. The goal was to automate the ETL pipeline, ensuring low-latency data processing for both analytics and real-time search.
+
+🔹 Key Challenges:
+Processing large volumes of structured & semi-structured data efficiently.
+Ensuring real-time searchability and traditional analytics within the same pipeline.
+Implementing fault-tolerant, automated workflows with zero manual intervention.
+Handling failures and retries effectively to ensure reliability.
+
+🔹 Solution Approach:
+
+1️⃣ Data Ingestion with Azure Data Factory (ADF)
+Azure Blob Storage stores raw structured (CSV) and semi-structured (JSON) data.
+ADF pipelines fetch data from Blob Storage and initiate Spark-based transformations.
+
+2️⃣ Transformation with Apache Spark on Azure Synapse
+Spark is used to compute key metrics like average TTI (Time to Interactive) and TTAR (Time to Action Response) per page URL.
+Transformation logic is scalable to handle both real-time and batch processing.
+
+3️⃣ Output Storage & Search Integration
+Azure Synapse Analytics stores processed data for traditional analytics & BI reporting.
+Azure Cognitive Search enables real-time search and visualization of key metrics.
+
+4️⃣ Orchestration & Automation
+Azure Functions & Logic Apps orchestrate the ETL pipeline, handling task retries with exponential backoff.
+Azure Monitor is integrated for detailed tracking, logging, and alerting.
+
+
 ## Learnings & Insights
 
 - **Automation & Scalability:** Leveraging managed Azure services (Data Factory, Functions, Logic Apps) enables scalable and automated ETL workflows.
