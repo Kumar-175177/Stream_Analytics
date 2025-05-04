@@ -141,6 +141,63 @@ Ensuring real-time searchability and traditional analytics within the same pipel
 Implementing fault-tolerant, automated workflows with zero manual intervention.
 Handling failures and retries effectively to ensure reliability.
 
+Architecture: Medallion Architecture (Bronze → Silver → Gold layers) for incremental data refinement.
+
+Data Flow & Transformations:
+Data Ingestion (Bronze Layer):
+
+Source:
+
+Structured: CSV files (e.g., sales data with columns like ProductID, Revenue, Region).
+
+Semi-structured: JSON logs (e.g., web clickstreams with nested fields like page_url, user_actions, TTI, TTAR).
+
+Ingestion:
+
+ADF pipelines pull raw data from Azure Blob Storage (or ADLS Gen2) into the bronze layer.
+
+Schema validation using Spark (e.g., enforcing page_url as a non-null field in JSON logs).
+
+Transformation (Silver Layer):
+
+Spark Processing (Azure Synapse Spark Pools):
+
+Data Cleansing:
+
+Handle missing values (e.g., default TTI=0 for incomplete logs).
+
+Flatten nested JSON (e.g., extract user_actions array into separate rows).
+
+Metrics Calculation:
+
+TTI (Time to Interactive): Average time for a page to become interactive.
+
+TTAR (Time to Action Response): Average time for a user action (e.g., button click) to receive a response.
+
+Aggregated metrics by page_url using Spark SQL:
+
+sql
+SELECT page_url, AVG(TTI) AS avg_tti, AVG(TTAR) AS avg_ttar  
+FROM cleaned_clickstream  
+GROUP BY page_url  
+Output: Write cleansed data & metrics to Delta Lake tables (Parquet) in the silver layer.
+
+Aggregation (Gold Layer):
+
+Business-Ready Data:
+
+Join structured sales data with aggregated metrics (e.g., avg_tti per product page).
+
+Enrich with master data (e.g., product catalog from SQL DB).
+
+Output:
+
+Azure Synapse Analytics: Sink transformed tables for BI tools (Power BI).
+
+Azure Cognitive Search: Index key metrics (e.g., page_url, avg_tti) for real-time dashboards.
+
+
+
 🔹 Solution Approach:
 
 1️⃣ Data Ingestion with Azure Data Factory (ADF)
