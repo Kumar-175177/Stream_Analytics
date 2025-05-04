@@ -141,60 +141,97 @@ Ensuring real-time searchability and traditional analytics within the same pipel
 Implementing fault-tolerant, automated workflows with zero manual intervention.
 Handling failures and retries effectively to ensure reliability.
 
-Architecture: Medallion Architecture (Bronze → Silver → Gold layers) for incremental data refinement.
+🏗️ Architecture: Medallion Design (Bronze → Silver → Gold Layers)
+Bronze Layer: Raw data ingestion
 
-Data Flow & Transformations:
-Data Ingestion (Bronze Layer):
+Silver Layer: Cleaned & transformed data
 
-Source:
+Gold Layer: Business-ready data for analytics
 
-Structured: CSV files (e.g., sales data with columns like ProductID, Revenue, Region).
+🔄 Data Flow & Transformations
+🧪 Data Ingestion (Bronze Layer)
+Sources:
 
-Semi-structured: JSON logs (e.g., web clickstreams with nested fields like page_url, user_actions, TTI, TTAR).
+Structured: CSV files (e.g., sales_data.csv with columns: ProductID, Revenue, Region)
 
-Ingestion:
+Semi-structured: JSON logs (e.g., clickstreams with nested fields like page_url, user_actions, TTI, TTAR)
 
-ADF pipelines pull raw data from Azure Blob Storage (or ADLS Gen2) into the bronze layer.
+Ingestion Process:
 
-Schema validation using Spark (e.g., enforcing page_url as a non-null field in JSON logs).
+Azure Data Factory (ADF) pipelines pull data from Azure Blob Storage / ADLS Gen2
 
-Transformation (Silver Layer):
+Schema validation using Apache Spark
 
-Spark Processing (Azure Synapse Spark Pools):
+Example: Enforce page_url as a non-null field in JSON logs
+
+⚙️ Transformation (Silver Layer)
+Processing Tool: Azure Synapse Spark Pools
 
 Data Cleansing:
 
-Handle missing values (e.g., default TTI=0 for incomplete logs).
+Handle missing values (e.g., set default TTI = 0 if missing)
 
-Flatten nested JSON (e.g., extract user_actions array into separate rows).
+Flatten nested JSON fields
+
+Example: Convert user_actions array into separate rows
 
 Metrics Calculation:
 
-TTI (Time to Interactive): Average time for a page to become interactive.
+TTI: Average Time to Interactive
 
-TTAR (Time to Action Response): Average time for a user action (e.g., button click) to receive a response.
+TTAR: Average Time to Action Response
 
-Aggregated metrics by page_url using Spark SQL:
+Aggregation Example:
 
 sql
+Copy
+Edit
 SELECT page_url, AVG(TTI) AS avg_tti, AVG(TTAR) AS avg_ttar  
 FROM cleaned_clickstream  
-GROUP BY page_url  
-Output: Write cleansed data & metrics to Delta Lake tables (Parquet) in the silver layer.
-
-Aggregation (Gold Layer):
-
-Business-Ready Data:
-
-Join structured sales data with aggregated metrics (e.g., avg_tti per product page).
-
-Enrich with master data (e.g., product catalog from SQL DB).
-
+GROUP BY page_url
 Output:
 
-Azure Synapse Analytics: Sink transformed tables for BI tools (Power BI).
+Store cleaned data and metrics in Delta Lake tables (Parquet format) in the Silver Layer
 
-Azure Cognitive Search: Index key metrics (e.g., page_url, avg_tti) for real-time dashboards.
+📊 Aggregation (Gold Layer)
+Business-Ready Data:
+
+Join sales data (structured) with clickstream metrics (e.g., avg_tti per product page)
+
+Enrich with master data (e.g., product catalog from SQL Database)
+
+Outputs:
+
+Azure Synapse Analytics: Load for BI Tools like Power BI
+
+Azure Cognitive Search: Index metrics (page_url, avg_tti) for real-time search and dashboards
+
+🤖 Automation & Reliability
+🧩 Orchestration
+ADF Pipelines: Triggered on new data arrival
+
+Azure Functions:
+
+Handle retry logic (e.g., for Spark job failures)
+
+Exponential backoff: Retry after 1s → 2s → 4s
+
+Azure Logic Apps:
+
+Human-in-the-loop approvals if failures exceed thresholds
+
+📈 Monitoring & Alerting
+Azure Monitor:
+
+Track pipeline health: ADF activity run times, Spark job failures
+
+Alerts:
+
+Sent via Email / Microsoft Teams
+
+Triggered for SLA breaches (e.g., data latency > 15 minutes)
+
+
 
 
 
