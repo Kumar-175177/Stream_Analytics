@@ -148,6 +148,16 @@ Silver Layer: Cleaned & transformed data
 
 Gold Layer: Business-ready data for analytics
 
+Data Details
+Data Sources:
+
+Structured Data (CSV): Server logs
+
+Columns: timestamp, log_level, server_id, user_id, message, response_time, status_code
+Semi-Structured Data (JSON): Application event metadata
+
+JSON Fields: event_type, device, os, location, event_properties (nested field with keys like latency, error_code, retry_count)
+
 🔄 Data Flow & Transformations
 🧪 Data Ingestion (Bronze Layer)
 Sources:
